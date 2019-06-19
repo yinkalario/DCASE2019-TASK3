@@ -30,7 +30,7 @@ The input features used are log mel, intensity vector in mel space and GCC-PHAT 
 
 ## Using codes
 
-The codes in this repo are fully reproducible. It only depends on the seed. With the seed unchanged, the results will be exactly the same for every run.
+The codes in this repo are fully reproducible. It only depends on the seed. With the seed unchanged, the results will be exactly the same for every run. Please also refer to the requirements_pip.yaml and requirements_conda.yaml, which list the corresponding packages.
 
 ### 0. Prepare data
 
@@ -108,7 +108,7 @@ In order to use this stacking, one should:
 
 - Extract SED prediction files from ./appendixes/submissions_eval/$MODEL_FOLDER/sed_mask_fusioned/, and copy those files to a folder named 'model_1' eg., this 'model_1' folder should be placed under a path specified as DEV_MODELS_PATH or EVAL_MODELS_PATH in ./stacking/run.sh
 
-- In this code, up to four models are stacking fusioned, so if you try to use stacking, four folders which are 'model_1', 'model_2', 'model_3' and 'model_4' should be created and filled in with the data extracted from four models.
+- In this code, up to four models are stacking fusioned, so if you try to use stacking, four folders which are 'model_1', 'model_2', 'model_3' and 'model_4' should be created and filled in with the data extracted from four models. More models could be used for ensemble, simply modify the list 'MODEL' in ./stacking/meta_features.py
 
 then run
 
