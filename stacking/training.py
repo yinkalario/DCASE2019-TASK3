@@ -30,6 +30,9 @@ def train_and_predict(x_train, y_train, x_val, y_val, x_test):
     """
     _ensure_reproducibility()
 
+    # Determine which device (GPU or CPU) to use
+    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+
     # Convert data into PyTorch tensors
     x_train = torch.FloatTensor(x_train).transpose(1, 2)
     x_val = torch.FloatTensor(x_val).transpose(1, 2)
@@ -40,7 +43,7 @@ def train_and_predict(x_train, y_train, x_val, y_val, x_test):
     # Instantiate neural network
     n_classes = y_train.shape[-1]
     n_feats = x_train.shape[1]
-    net = CRNN(n_classes, n_feats).cuda()
+    net = CRNN(n_classes, n_feats).to(device)
 
     # Use binary cross-entropy loss function
     criterion = BCELoss()
@@ -61,10 +64,10 @@ def train_and_predict(x_train, y_train, x_val, y_val, x_test):
         # Train model using training set
         pbar = tqdm(loader_train)
         pbar.set_description('Epoch %d' % epoch)
-        train(net, criterion, optimizer, pbar, logger)
+        train(net, criterion, optimizer, pbar, logger, device)
 
         # Evaluate model using validation set and monitor F1 score
-        validate(net, criterion, loader_val, logger)
+        validate(net, criterion, loader_val, logger, device)
         logger.monitor('val_f1')
 
         # Print training and validation results
@@ -84,30 +87,22 @@ def train_and_predict(x_train, y_train, x_val, y_val, x_test):
     return np.mean(y_preds, axis=0)
 
 
-def train(net, criterion, optimizer, loader, logger):
+def train(net, criterion, optimizer, loader, logger, device=None):
     for batch_x, batch_y in loader:
-        # Copy to CUDA memory to train on GPU
-        batch_x = batch_x.cuda()
-        batch_y = batch_y.cuda()
-
         optimizer.zero_grad()
-        output = net(batch_x)
-        loss = criterion(output, batch_y)
+        output = net(batch_x.to(device))
+        loss = criterion(output, batch_y.to(device))
         loss.backward()
         optimizer.step()
 
         logger.log('loss', loss.item())
 
 
-def validate(net, criterion, loader, logger):
+def validate(net, criterion, loader, logger, device=None):
     for batch_x, batch_y in loader:
-        # Copy to CUDA memory to validate on GPU
-        batch_x = batch_x.cuda()
-        batch_y = batch_y.cuda()
+        output = net(batch_x.to(device))
 
-        output = net(batch_x)
-
-        loss = criterion(output, batch_y)
+        loss = criterion(output, batch_y.to(device))
         logger.log('val_loss', loss.item())
 
         f1_score = utils.f1_score(_flatten(batch_y).cpu(),
