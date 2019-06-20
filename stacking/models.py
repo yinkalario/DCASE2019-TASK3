@@ -24,19 +24,3 @@ class ConvBN(nn.Module):
 
     def forward(self, x):
         return F.relu(self.bn(self.conv(x)))
-
-
-class ConvBlock(nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size=7, **args):
-        super(ConvBlock, self).__init__()
-        self.conv1 = nn.Conv1d(in_channels, out_channels, kernel_size, **args)
-        self.conv2 = nn.Conv1d(out_channels, out_channels, kernel_size, **args)
-        self.bn1 = nn.BatchNorm1d(out_channels)
-        self.bn2 = nn.BatchNorm1d(out_channels)
-
-    def forward(self, x, pool_size=1):
-        x = F.relu(self.bn1(self.conv1(x)))
-        x = F.relu(self.bn2(self.conv2(x)))
-        if pool_size > 1:
-            x = F.max_pool1d(x, pool_size)
-        return x
