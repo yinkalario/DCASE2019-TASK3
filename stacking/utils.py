@@ -20,8 +20,8 @@ def trim_clips(model_dirs):
 
 
 def read_metadata(path, block_size=100):
-    return pd.concat([read_metadata_file(path, fname, block_size) 
-        for fname in sorted(os.listdir(path))])
+    return pd.concat([read_metadata_file(path, fname, block_size)
+                      for fname in sorted(os.listdir(path))])
 
 
 def read_metadata_file(path, fname, block_size=100):
