@@ -54,7 +54,8 @@ def train_and_predict(x_train, y_train, x_val, y_val, x_test):
     # Use helper class to iterate over data in batches
     loader_train = DataLoader(TensorDataset(x_train, y_train),
                               batch_size=128, shuffle=True)
-    loader_val = DataLoader(TensorDataset(x_val, y_val), batch_size=128)
+    loader_val = DataLoader(TensorDataset(x_val, y_val), batch_size=512)
+    loader_test = DataLoader(TensorDataset(x_test), batch_size=512)
 
     # Instantiate Logger to record training/validation performance
     # Configure to save the states of the top 3 models during validation
@@ -76,16 +77,12 @@ def train_and_predict(x_train, y_train, x_val, y_val, x_test):
         # Invoke learning rate scheduler
         scheduler.step()
 
-    # Predict on CPU to save GPU memory
-    net.cpu()
-
     # Ensemble top 3 model predictions
     y_preds = []
     for state_dict in logger.state_dicts:
         net.load_state_dict(state_dict)
-        with torch.no_grad():
-            y_preds.append(_flatten(net(x_test)).numpy())
-    return np.mean(y_preds, axis=0)
+        y_preds.append(_flatten(predict(net, loader_test, device)))
+    return torch.stack(y_preds).mean(dim=0).cpu().numpy()
 
 
 def train(net, criterion, optimizer, loader, logger, device=None):
@@ -110,6 +107,11 @@ def validate(net, criterion, loader, logger, device=None):
         f1_score = utils.f1_score(_flatten(batch_y).cpu(),
                                   _flatten(output).cpu())
         logger.log('val_f1', f1_score)
+
+
+def predict(net, loader, device=None):
+    with torch.no_grad():
+        return torch.cat([net(batch_x.to(device)) for batch_x, in loader])
 
 
 def _flatten(x):
