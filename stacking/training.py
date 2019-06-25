@@ -64,10 +64,10 @@ def train_and_predict(x_train, y_train, x_val, y_val, x_test):
         # Train model using training set
         pbar = tqdm(loader_train)
         pbar.set_description('Epoch %d' % epoch)
-        train(net, criterion, optimizer, pbar, logger, device)
+        train(net.train(), criterion, optimizer, pbar, logger, device)
 
         # Evaluate model using validation set and monitor F1 score
-        validate(net, criterion, loader_val, logger, device)
+        validate(net.eval(), criterion, loader_val, logger, device)
         logger.monitor('val_f1')
 
         # Print training and validation results
@@ -83,7 +83,8 @@ def train_and_predict(x_train, y_train, x_val, y_val, x_test):
     y_preds = []
     for state_dict in logger.state_dicts:
         net.load_state_dict(state_dict)
-        y_preds.append(_flatten(net(x_test)).numpy())
+        with torch.no_grad():
+            y_preds.append(_flatten(net(x_test)).numpy())
     return np.mean(y_preds, axis=0)
 
 
@@ -100,7 +101,8 @@ def train(net, criterion, optimizer, loader, logger, device=None):
 
 def validate(net, criterion, loader, logger, device=None):
     for batch_x, batch_y in loader:
-        output = net(batch_x.to(device))
+        with torch.no_grad():
+            output = net(batch_x.to(device))
 
         loss = criterion(output, batch_y.to(device))
         logger.log('val_loss', loss.item())
