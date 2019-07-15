@@ -10,7 +10,18 @@ git clone https://github.com/yinkalario/DCASE2019-TASK3
 
 ## Citation
 
-To be appear.
+The code in this repo is easy to understand and implement. If you use our codes in any format, please consider citing the following paper:
+
+>@techreport{Cao2019,
+    Author = "Cao, Yin and Iqbal, Turab and Kong, Qiuqiang and Galindo, Miguel and Wang, Wenwu and Plumbley, Mark",
+    institution = "DCASE2019 Challenge",
+    title = "TWO-STAGE SOUND EVENT LOCALIZATION AND DETECTION USING INTENSITY VECTOR AND GENERALIZED CROSS-CORRELATION",
+    month = "June",
+    year = "2019"
+}
+>Paper URL: chrome-extension://cdonnmffkdaoajfknoeeecmchibpmkmg/static/pdf/web/viewer.html?file=http%3A%2F%2Fdcase.community%2Fdocuments%2Fchallenge2019%2Ftechnical_reports%2FDCASE2019_Cao_74.pdf
+
+You could also check our previous code on: https://github.com/yinkalario/Two-Stage-Polyphonic-Sound-Event-Detection-and-Localization
 
 ## Dataset
 
